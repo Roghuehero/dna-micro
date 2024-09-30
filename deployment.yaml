@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whoami-nodejs-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: whoami-nodejs
+  template:
+    metadata:
+      labels:
+        app: whoami-nodejs
+    spec:
+      containers:
+      - name: whoami-nodejs
+        image: congtaojiang/whoami-nodejs-express
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whoami-nodejs-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: whoami-nodejs
+  ports:
+  - port: 80
+    targetPort: 8080
