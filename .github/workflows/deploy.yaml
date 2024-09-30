@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -19,12 +20,19 @@ jobs:
 
       - name: Configure kubectl
         run: |
+          # Create a kubeconfig file from the GitHub secret
           echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig
+          # Set the KUBECONFIG environment variable
           export KUBECONFIG=${{ github.workspace }}/kubeconfig
+
+      - name: Verify Kubernetes Cluster Connectivity
+        run: kubectl cluster-info
 
       - name: Apply Kubernetes manifests
         run: |
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
           kubectl apply -f canary-deployment.yaml
-          
+
+      - name: Debug Kubernetes Resources
+        run: kubectl get all
