@@ -1,4 +1,4 @@
-name: Deploy to Kubernetes
+name: Deploy to AKS
 
 on:
   push:
@@ -13,16 +13,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Set up Azure CLI
+        uses: azure/CLI@v1
+        with:
+          azcliversion: latest
+
+      - name: Login to Azure
+        run: |
+          az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+          az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: Set up kubectl
         uses: azure/setup-kubectl@v1
         with:
           version: 'latest'
 
-      - name: Configure kubectl
+      - name: Configure kubectl with kubeconfig
         run: |
-          # Create a kubeconfig file from the GitHub secret
           echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig
-          # Set the KUBECONFIG environment variable
           export KUBECONFIG=${{ github.workspace }}/kubeconfig
 
       - name: Verify Kubernetes Cluster Connectivity
@@ -33,6 +41,3 @@ jobs:
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
           kubectl apply -f canary-deployment.yaml
-
-      - name: Debug Kubernetes Resources
-        run: kubectl get all
