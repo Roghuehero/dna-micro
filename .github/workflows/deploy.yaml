@@ -29,7 +29,11 @@ jobs:
       - name: Configure kubectl with kubeconfig
         run: |
           echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig
-          export KUBECONFIG=${{ github.workspace }}/kubeconfig
+          echo "KUBECONFIG=${{ github.workspace }}/kubeconfig" >> $GITHUB_ENV
+
+      - name: Show Kubeconfig
+        run: |
+          cat kubeconfig
 
       - name: Verify Kubernetes Cluster Connectivity
         run: |
