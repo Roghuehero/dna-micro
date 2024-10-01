@@ -32,7 +32,9 @@ jobs:
           export KUBECONFIG=${{ github.workspace }}/kubeconfig
 
       - name: Verify Kubernetes Cluster Connectivity
-        run: kubectl cluster-info
+        run: |
+          echo "Kubeconfig location: $KUBECONFIG"
+          kubectl cluster-info
 
       - name: Apply Kubernetes manifests
         run: |
