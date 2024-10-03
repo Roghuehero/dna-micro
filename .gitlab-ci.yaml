@@ -1,0 +1,17 @@
+stages:
+  - deploy
+
+variables:
+  KUBE_CONFIG: "/d/terr_dna/git_terra/dna-micro/kubeconfig"  # Ensure this path points to the kubeconfig file
+
+deploy:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - mkdir -p ~/.kube
+    - echo "$KUBE_CONFIG_CONTENT" > ~/.kube/config  # Ensure variable name matches
+    - kubectl apply -f deployment.yaml
+    - kubectl apply -f service.yaml
+    - kubectl apply -f canary-deployment.yaml
+  only:
+    - main
